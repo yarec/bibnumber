@@ -395,6 +395,7 @@ void TextDetector::detect(IplImage * input,
 	cvSaveImage("text-boxes.png", output);
 
 
+    std::cout << "-------- detect end --------" << std::endl;
 
 	cvReleaseImage(&output);
 	cvReleaseImage(&gradientX);

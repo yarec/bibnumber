@@ -303,7 +303,7 @@ int TextRecognizer::recognize(IplImage *input,
 			}
 			if (!is_number(s_out)) {
 				LOGL(LOG_TEXTREC, "Text is not a number ('" << s_out << "')");
-				break;
+				//break;
 			}
 
 			/* adjust width to size of 6 digits */
@@ -418,8 +418,8 @@ int TextRecognizer::recognize(IplImage *input,
 				/* save for training only if orientation is ~horizontal */
 				if (abs(theta_deg) < 7) {
 					char *filename;
-					asprintf(&filename, "bib-%05d-%04d.png", this->bsid++,
-							atoi(out));
+                    std::cout << " ------ " << s_out << std::endl;
+					asprintf(&filename, "bib-%05d-%s.png", this->bsid++, s_out.c_str());
 					cv::imwrite(filename, bibMat);
 					free(filename);
 				}

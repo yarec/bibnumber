@@ -9,7 +9,7 @@ namespace pipeline
 {
 	class Pipeline {
 	public:
-		int processImage(cv::Mat& img, std::string svmModel, std::vector<int>& bibNumbers);
+		int processImage(cv::Mat& img, std::string svmModel, std::vector<int>& bibNumbers, std::vector<std::string>& text);
 	private:
 		textdetection::TextDetector textDetector;
 		textrecognition::TextRecognizer textRecognizer;

@@ -8,6 +8,7 @@
 #include <boost/bimap.hpp>
 #include <boost/bimap/set_of.hpp>
 #include <boost/bimap/multiset_of.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -68,7 +69,9 @@ static int processSingleImage(
 		std::string fileName,
 		std::string svmModel,
 		pipeline::Pipeline &pipeline,
-		std::vector<int>& bibNumbers)
+		std::vector<int>& bibNumbers,
+        std::vector<std::string>& text
+        )
 {
 	int res;
 
@@ -82,7 +85,7 @@ static int processSingleImage(
 	}
 
 	/* process image */
-	res = pipeline.processImage(image, svmModel, bibNumbers);
+	res = pipeline.processImage(image, svmModel, bibNumbers, text);
 	if (res < 0) {
 		std::cerr << "ERROR: Could not process image" << std::endl;
 		return -1;
@@ -94,12 +97,22 @@ static int processSingleImage(
 			bibNumbers.end());
 
 	/* display result */
-	std::cout << "Read: [";
+	std::cout << "Read Num: [";
 	for (std::vector<int>::iterator it = bibNumbers.begin();
 			it != bibNumbers.end(); ++it) {
 		std::cout << " " << *it;
 	}
 	std::cout << "]" << std::endl;
+
+	/* display result */
+	std::cout << "Read: [";
+	for (std::vector<std::string>::iterator it = text.begin(); it != text.end();
+					it++) {
+		boost::algorithm::trim(*it);
+        std::cout << it->c_str();
+    }
+	std::cout << "]" << std::endl;
+
 
 	return res;
 }
@@ -161,7 +174,8 @@ int process(std::string inputName, std::string svmModel) {
 
 		if (isImageFile(inputName)) {
 			std::vector<int> bibNumbers;
-			res = processSingleImage(inputName, svmModel, pipeline, bibNumbers);
+            std::vector<std::string> text;
+            res = processSingleImage(inputName, svmModel, pipeline, bibNumbers, text);
 		} else if (boost::algorithm::ends_with(name, ".csv")) {
 
 			int true_positives = 0;
@@ -180,11 +194,12 @@ int process(std::string inputName, std::string svmModel) {
 				std::string filename = row[0];
 				std::vector<int> groundTruthNumbers;
 				std::vector<int> bibNumbers;
+                std::vector<std::string> text;
 
 				fs::path file(filename);
 				fs::path full_path = dirname / file;
 
-				processSingleImage(full_path.string(), svmModel, pipeline, bibNumbers);
+				processSingleImage(full_path.string(), svmModel, pipeline, bibNumbers, text);
 
 				for (unsigned int i = 1; i < row.size(); i++)
 					groundTruthNumbers.push_back(atoi(row[i].c_str()));
@@ -250,9 +265,10 @@ int process(std::string inputName, std::string svmModel) {
 		/* process images */
 		for (int i = 0, j=img_paths.size(); i<j ; i++) {
 			std::vector<int> bibNumbers;
+            std::vector<std::string> text;
 
 			std::cout << std::endl << "[" << i+1 << "/" << j << "] ";
-			res = processSingleImage(img_paths[i].string(), svmModel, pipeline, bibNumbers);
+			res = processSingleImage(img_paths[i].string(), svmModel, pipeline, bibNumbers, text);
 
 			for (unsigned int k = 0; k < bibNumbers.size(); k++) {
 				tags.insert(

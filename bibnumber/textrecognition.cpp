@@ -261,6 +261,13 @@ int TextRecognizer::recognize(IplImage *input,
 		cv::Mat mat = cv::Mat::zeros(roi.height + 2 * border,
 				roi.width + 2 * border, grayMat.type());
 		cv::Mat tmp = rotatedMat(roi);
+#if 0
+        cv::Mat roiMat = inputMat(roi);
+        char *filename_roi;
+        asprintf(&filename_roi, "bib-%05d-%d.png", this->bsid+1, i);
+        cv::imwrite(filename_roi, roiMat);
+        free(filename_roi);
+#endif
 		/* copy bounded box from rotated mat to new mat with borders - borders are needed
 		 * to improve OCR success rate
 		 */
